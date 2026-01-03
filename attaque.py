@@ -1,4 +1,4 @@
-from feistel import chiffrement_feistel,moitie, fonction_xor,keys
+from feistel import chiffrement_feistel,moitie, fonction_xor,keys, fonction, diviser_en_deux
 import random
 
 delta_p = 1 << 8
@@ -7,15 +7,15 @@ pairs_chiffre=[]
 
 
 def generation_paires_test():               ## pour generer des paires de messages avec une seule difference a tester
-    for i in range (400):
+    for i in range (15000):
         p = random.randint(1,260)
         p_prime = fonction_xor(delta_p, p)
         pairs.append((p,p_prime))
         
     return (pairs)
 
-def comparaison(keys,p,p_prime):
-    for _ in range (400):
+def comparaison(keys,pairs):
+    for p,p_prime in pairs:
         c = chiffrement_feistel(keys, p)
         c_prime = chiffrement_feistel(keys,p_prime)
         pairs_chiffre.append((c,c_prime))
@@ -32,23 +32,30 @@ keys_last = {
     'k7': 0,
 }
 
-def recherche_lastkey(pairs, keys_last):
-    scores = {k: 0 for k in range(64)}                                    # Clés candidates de 0 à 63 (6 bits)
+def recherche_lastkey(pairs_chiffree, keys_last):
+    scores = {k: 0 for k in range(16)}  
+    # Clés candidates de 0 à 255 (8 bits)
+    for search_kn in range(16):
+        keys_candidate = keys_last.copy()
+        keys_candidate['k8'] = search_kn
 
-    for search_kn in range(64):
+        for c, c_prime in pairs_chiffree:
+            # if isinstance(c, str):
+            #     c = int(c, 2)
+            # if isinstance(c_prime, str):
+            #     c_prime = int(c_prime, 2)
+            
+            c1 = chiffrement_feistel(keys_candidate, c)
+            c1_prime = chiffrement_feistel(keys_candidate, c_prime)
 
-        for C, C_prime in pairs_chiffre:
-            # extraire la partie droite (8 bits)
-            R  = C ^ search_kn 
-            R_ = C_prime ^ search_kn 
-
-            # test différentiel NON trivial
-            if (R ^ R_)  == 0 :
+            if fonction_xor(c1, c1_prime) == delta_p:
                 scores[search_kn] += 1
 
-    cle_devinee = max(scores, key=scores.get)
-    return scores, cle_devinee, search_kn
-
+    if scores[search_kn] != 0:
+        cle_devinee = max(scores, key=scores.get)
+        return scores[search_kn], cle_devinee, search_kn
+    else:
+        return None, None, None
 
 
 
