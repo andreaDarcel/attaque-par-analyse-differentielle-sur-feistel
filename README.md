@@ -35,7 +35,7 @@ Fonctionnalités principales :
 
 Les équations utilisées sont :
 - L(i+1) = R(i)
-- R(i+1) = L(i) XOR F(R(i), K(i))  avec F la fonction XOR
+- R(i+1) = L(i) XOR F(R(i), K(i))  avec F la fonction XOR passee dans une permutation definie
 
 
 ### differential.py
@@ -61,10 +61,10 @@ Rôle :
 
 ## 4. Paramètres du chiffrement simulé
 
-- Taille du bloc : 16 bits  
-- Découpage : 8 bits gauche / 8 bits droite  
-- Nombre de tours : 3 ou 4  
-- Fonction F : opération simple non linéaire, la fonction XOR
+- Taille du bloc : 8 bits  
+- Découpage : 4 bits gauche / 4 bits droite  
+- Nombre de tours : 3   
+- Fonction F : opération simple non linéaire, la fonction XOR puis passage dans une PBOX
 - Sous-clés : valeurs générées pour la simulation  
 
 Ces paramètres sont choisis afin de rendre l’attaque observable avec un nombre raisonnable de tests.
